@@ -40,7 +40,10 @@ private:
 	void Get_CmRequest(CString sLotId, CString sCmId);
 	void Get_CmEnd(CString sLotId, CString sCmId, CString sResult, CString sNgCode, CString sPocket, CString sMarginal);
 	void Get_IdleReport(CString sOperId, CString sSTime, CString sETime, CString sCode, CString nType);
+		
 	void Get_RecipeList(CString sRecipeData);
+	void Get_RecipeReport(CString sVersion);
+
 	void Get_TerminalOK();
 
 	void Get_NGLotRequest();
@@ -62,6 +65,8 @@ public:
 	void Set_ModuleFail();
 	void Set_ModuleData();
 	void Set_NGLotStart();
+
+	void Set_PPSelect();
 
 	void Set_RecipeListRequest(BOOL bList);
 	void Set_HostMsg(CString sMsg);

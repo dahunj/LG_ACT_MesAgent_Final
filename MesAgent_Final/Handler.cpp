@@ -104,7 +104,8 @@ LRESULT CHandler::OnServerReceive(WPARAM wClientIdx, LPARAM lServerPort)
 	m_strRecvCmd += strRecvSocket;
 
 	CMesAgentDlg *pMainDlg = (CMesAgentDlg*)AfxGetMainWnd();
-	while (!m_strRecvCmd.IsEmpty()) {
+	while (!m_strRecvCmd.IsEmpty()) 
+	{
 		int nStart = m_strRecvCmd.Find("@");
 		int nEnd = m_strRecvCmd.Find("\n");
 
@@ -167,6 +168,7 @@ LRESULT CHandler::OnServerReceive(WPARAM wClientIdx, LPARAM lServerPort)
 
 		} else if (strCmd == "RECIPE") {
 			if (strOp == "REQUEST")	Get_RecipeList(strRecv);
+			if (strOp == "REPORT") Get_RecipeReport(strArg[0]);
 
 		} else if (strCmd == "IDLE") {
 // 			if (strOp == "REQUEST") Get_IdleRequest();
@@ -297,6 +299,11 @@ void CHandler::Get_RecipeList(CString sRecipeData)
 		}
 		g_objHost.Set_S7F20();
 	}
+}
+
+void CHandler::Get_RecipeReport(CString sVersion)
+{
+	g_objHost.Set_S6F11_PPSelectReport(gMes.sHostLotId);	
 }
 
 void CHandler::Get_CmRequest(CString sLotId, CString sCmId)
@@ -456,6 +463,14 @@ void CHandler::Set_NGLotStart()
 	strSend.Format("NGLOT,START,%s,%s,%s", gMes.sHostNGLotId, gMes.sHostNGVendor, gMes.sHostNGConfig);
 	Send_Command(strSend);
 }
+
+void CHandler::Set_PPSelect()
+{
+	CString strSend;
+	strSend.Format("RECIPE,SELECT,%s,%s", gMes.sHostLotId, gMes.sHostRecipe);
+	Send_Command(strSend);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

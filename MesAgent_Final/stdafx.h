@@ -90,6 +90,9 @@ typedef struct {
 	int			nAlarmID;
 	CString		sAlarmTxt;
 	CString		sGMESData[11];
+
+
+	CString		sVersion;
 } GLOVAL_DATA;
 
 typedef struct {
@@ -100,6 +103,7 @@ typedef struct {
 	int			nHostCmCount;
 	CString		sHostVendor;
 	CString		sHostConfig;
+
 
 	CString		sCancelLotId;
 	CString		sCancelRecipe;

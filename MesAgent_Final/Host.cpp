@@ -333,6 +333,9 @@ BOOL CHost::Extract_Xml(CString sXmlData)
 ///////////////////////////////////////////////////////////////////////////////
 // Get Command
 
+
+
+
 void CHost::Get_S1F2()
 {
 	// S1F1 에 대한 응답
@@ -394,6 +397,11 @@ void CHost::Get_S10F3()
 	Set_S10F4();
 }
 
+void CHost::Get_S7F25()
+{
+	g_objHost.Set_S7F26();
+}
+
 void CHost::Get_S2F49_LotStart()
 {
 	Set_S2F50_LotStart();
@@ -428,6 +436,18 @@ void CHost::Get_S2F49_NGLotStart()
 {
 	Set_S2F50_NGLotStart();
 	g_objHandler.Set_NGLotStart();
+}
+
+void CHost::Get_S2F49_PPSelect()
+{
+	Set_S2F50_PPSelect();
+	g_objHandler.Set_PPSelect();
+}
+
+void CHost::Get_S2F49_PPUploadConfirm()
+{
+	Set_S2F50_PPUploadConfirm();
+	Set_S6F11_PPUploadCompletedReport(gMes.sHostLotId);
 }
 
 /*
@@ -546,6 +566,80 @@ void CHost::Set_S7F20()
 
 	Send_Command(strSend, TRUE, "S7F20");
 }
+
+
+
+void CHost::Set_S7F26()
+{
+	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
+
+	CString strTotal;
+	//strTotal.Format("%d", gData.nTotalCnt+nHandlerDataIdCount);
+
+	strSend += "<EIF VERSION=\"2.0\" ID=\"S7F26\" NAME=\"Formatted Process Program Data\">" + CRLF;
+	strSend += "  <ELEMENT>" + CRLF;
+	strSend += "    <EQPID VALUE=\"" + gData.sEquipId + "\" />" + CRLF;
+	strSend += "  </ELEMENT>" + CRLF;
+	strSend += "  <ITEM>" + CRLF;
+	strSend += "    <PPID VALUE=\"" + gMes.sHostRecipe + "\" />" + CRLF;
+	strSend += "    <MDLN VALUE=\"0\"/>" + CRLF;
+	strSend += "    <SOFTREV VALUE=\"" + gData.sVersion + "\" />" + CRLF;
+	strSend += "    <LOTID VALUE=\"" + gMes.sHostLotId + "\" />" + CRLF;
+	strSend += "    <PROCID VALUE=\"" + gMes.sHostProcID + "\" />" + CRLF;
+	strSend += "    <PRODID VALUE=\"" + gMes.sHostModel + "\" />" + CRLF;
+	strSend += "    <PCLIST COUNT=\"" + strTotal +"\">" + CRLF;
+
+
+	//for (int i = 0; i < nHandlerDataIdCount; i++) 
+	//{
+	//	strSend += "    <LIST>" + CRLF;
+	//	strSend += "      <CCODE VALUE=\"" + vecHandlerData[i].first + "\" />" + CRLF;
+	//	strSend += "      <PPARM VALUE=\"" + vecHandlerData[i].second + "\" />" + CRLF;
+	//	strSend += "    </LIST>" + CRLF;
+	//}
+	//
+	//for(int j = 0; j < 5; j++)
+	//{
+	//	
+	//	for (int i = 0; i < gData.nFAICnt[j]; i++) 
+	//	//for (int i = 0; i < glistFAIInfo[j].size(); i++) 
+	//	{
+	//		strSend += "    <LIST>" + CRLF;
+	//		strSend += "      <CCODE VALUE=\"" + glistFAIInfo[j][i].key + "\" />" + CRLF;
+	//		strSend += "      <PPARM VALUE=\"" + glistFAIInfo[j][i].value + "\" />" + CRLF;
+	//		strSend += "    </LIST>" + CRLF;
+	//	}
+	//}
+	//payload capacity 한계로 인해 너무 커서 패킷이 유실 될 수 있다. 
+	/*for(int j = 0; j < 5; j++)
+	{
+		for (int i = 0; i < glistLightInfo[j].size(); i++) 
+		{
+		strSend += "    <LIST>" + CRLF;
+		strSend += "      <CCODE VALUE=\"" + glistLightInfo[j][i].key + "\" />" + CRLF;
+		strSend += "      <PPARM VALUE=\"" + glistLightInfo[j][i].value + "\" />" + CRLF;
+		strSend += "    </LIST>" + CRLF;
+		}
+	}*/
+
+	//for(int j = 0; j < 5; j++)
+	//{
+	//	for (int i = 0; i < glistParamInfo[j].size(); i++) 
+	//	{
+	//		strSend += "    <LIST>" + CRLF;
+	//		strSend += "      <CCODE VALUE=\"" + glistParamInfo[j][i].key + "\" />" + CRLF;
+	//		strSend += "      <PPARM VALUE=\"" + glistParamInfo[j][i].value + "\" />" + CRLF;
+	//		strSend += "    </LIST>" + CRLF;
+	//	}
+	//}	
+
+	strSend += "    </PCLIST>" + CRLF;
+	strSend += "  </ITEM>" + CRLF;
+	strSend += "</EIF>";
+
+	Send_Command(strSend, TRUE, "S7F26");
+}
+
 
 void CHost::Set_S2F4()
 {
@@ -1224,6 +1318,70 @@ void CHost::Set_S6F11_NGLotRequest()
 	Send_Command(strSend, FALSE, "S6F11", "20108");
 }
 
+
+void CHost::Set_S6F11_PPSelectReport(CString sLotId)
+{
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+
+	CString strTime;
+	strTime.Format("%04d%02d%02d%02d%02d%02d", time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond);
+
+	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
+
+	strSend += "<EIF VERSION=\"2.0\" ID=\"S6F11\" NAME=\"Event Report\">" + CRLF;
+	strSend += "  <ELEMENT>" + CRLF;
+	strSend += "    <EQPID VALUE=\"" + gData.sEquipId + "\" />" + CRLF;
+	strSend += "  </ELEMENT>" + CRLF;
+	strSend += "  <ITEM>" + CRLF;
+	strSend += "    <CEID NAME=\"CEID\" VALUE=\"40102\" />" + CRLF;
+	strSend += "    <RPTID NAME=\"RPTID\" VALUE=\"40102\" />" + CRLF;
+	strSend += "    <DVLIST COUNT=\"6\">" + CRLF;
+	strSend += "      <DV NAME=\"TIME\" VALUE=\"" + strTime + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"LOTID\" VALUE=\"" + sLotId + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"RECIPEID\" VALUE=\"" + gMes.sHostRecipe + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"PROCID\" VALUE=\"" + gMes.sHostProcID + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"PRODID\" VALUE=\"" + gMes.sHostModel + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"OPERATORID\" VALUE=\"" + gData.sOperId + "\" />" + CRLF;
+	strSend += "    </DVLIST>" + CRLF;
+	strSend += "  </ITEM>" + CRLF;
+	strSend += "</EIF>";
+
+	Send_Command(strSend, FALSE, "S6F11", "40102");
+}
+
+
+
+void CHost::Set_S6F11_PPUploadCompletedReport(CString sLotId)
+{
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+
+	CString strTime;
+	strTime.Format("%04d%02d%02d%02d%02d%02d", time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond);
+
+	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
+
+	strSend += "<EIF VERSION=\"2.0\" ID=\"S6F11\" NAME=\"Event Report\">" + CRLF;
+	strSend += "  <ELEMENT>" + CRLF;
+	strSend += "    <EQPID VALUE=\"" + gData.sEquipId + "\" />" + CRLF;
+	strSend += "  </ELEMENT>" + CRLF;
+	strSend += "  <ITEM>" + CRLF;
+	strSend += "    <CEID NAME=\"CEID\" VALUE=\"40103\" />" + CRLF;
+	strSend += "    <RPTID NAME=\"RPTID\" VALUE=\"40103\" />" + CRLF;
+	strSend += "    <DVLIST COUNT=\"4\">" + CRLF;
+	strSend += "      <DV NAME=\"TIME\" VALUE=\"" + strTime + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"LOTID\" VALUE=\"" + gMes.sHostLotId + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"RECIPEID\" VALUE=\"" + gMes.sHostRecipe + "\" />" + CRLF;
+	strSend += "      <DV NAME=\"OPERATORID\" VALUE=\"" + gData.sOperId + "\" />" + CRLF;
+	strSend += "    </DVLIST>" + CRLF;
+	strSend += "  </ITEM>" + CRLF;
+	strSend += "</EIF>";
+
+	Send_Command(strSend, FALSE, "S6F11", "40103");
+}
+
+
 void CHost::Set_S2F50_ModuleData()
 {
 	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
@@ -1241,6 +1399,46 @@ void CHost::Set_S2F50_ModuleData()
 	strSend += "</EIF>";
 
 	Send_Command(strSend, TRUE, "S2F50", "LOT_MODULE_DATA_DETAIL");
+}
+
+
+void CHost::Set_S2F50_PPSelect()
+{
+	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
+
+	strSend += "<EIF VERSION=\"2.0\" ID=\"S2F50\" NAME=\"Enhanced Remote Command Acknowledge\">" + CRLF;
+	strSend += "  <ELEMENT>" + CRLF;
+	strSend += "    <EQPID VALUE=\"" + gData.sEquipId + "\" />" + CRLF;
+	strSend += "  </ELEMENT>" + CRLF;
+	strSend += "  <ITEM>" + CRLF;
+	strSend += "    <RCMDCP>" + CRLF;
+	strSend += "      <RCMD NAME=\"RCMD\" VALUE=\"PP_SELECT\" />" + CRLF;
+	strSend += "    </RCMDCP>" + CRLF;
+	strSend += "    <HCACK NAME=\"HCACK\" VALUE=\"0\" />" + CRLF;
+	strSend += "  </ITEM>" + CRLF;
+	strSend += "</EIF>";
+
+	Send_Command(strSend, TRUE, "S2F50", "PP_SELECT");
+}
+
+
+void CHost::Set_S2F50_PPUploadConfirm()
+{
+	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
+
+	strSend += "<EIF VERSION=\"2.0\" ID=\"S2F50\" NAME=\"Enhanced Remote Command Acknowledge\">" + CRLF;
+	strSend += "  <ELEMENT>" + CRLF;
+	strSend += "    <EQPID VALUE=\"" + gData.sEquipId + "\" />" + CRLF;
+	strSend += "  </ELEMENT>" + CRLF;
+	strSend += "  <ITEM>" + CRLF;
+	strSend += "    <RCMDCP>" + CRLF;
+	strSend += "      <RCMD NAME=\"RCMD\" VALUE=\"PP_UPLOAD_CONFIRM\" />" + CRLF;
+	strSend += "    </RCMDCP>" + CRLF;
+	strSend += "    <HCACK NAME=\"HCACK\" VALUE=\"0\" />" + CRLF;
+	strSend += "  </ITEM>" + CRLF;
+	strSend += "</EIF>";
+
+	Send_Command(strSend, TRUE, "S2F50", "PP_UPLOAD_CONFIRM");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1580,3 +1778,4 @@ void CHost::Test_Set()
  	strSend.Format("%c%s%s%c", STX, strHead, m_sXMLData, ETX);
  	Test_Receive(strSend);
 }
+

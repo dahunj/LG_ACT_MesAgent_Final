@@ -53,6 +53,7 @@ private:
 	void Get_S2F31();	// Date and Time Set Request
 	void Get_S7F19();	// Recipe ID List 요청 
 	void Get_S10F3();	// Terminal Display, Single
+	void Get_S7F25();	// Formatted Process Program Request
 
 	void Get_S2F49_LotStart();		// Enhanced Remote Command
 	void Get_S2F49_LotCancel();		// Enhanced Remote Command
@@ -60,6 +61,9 @@ private:
 	void Get_S2F49_Module_Fail();	// Enhanced Remote Command
 	void Get_S2F49_Module_Data();
 	void Get_S2F49_NGLotStart();
+
+	void Get_S2F49_PPSelect();
+	void Get_S2F49_PPUploadConfirm();
 
 	void Reply_HeartBeat();	// Heart Beat
 	void Send_Command(CString sSend, BOOL bReply, CString sStFn, CString sRcmd="");	// XML
@@ -81,6 +85,8 @@ public:
 	void Set_S7F20();	// S7F19에 대한 응답 (Recipe List 회신)
 	void Set_S10F4();	// Terminal Display => S10F3 응답
 
+	void Set_S7F26();	// S7F25에 대한 응답 (Recipe Body 회신)
+
 	// Enhanced Remote Command Acknowledge, S2F49에 대한 응답
 	void Set_S2F50_LotStart();			// LotStart Ack
 	void Set_S2F50_LotCancel();			// LOT_ID_FAIL Ack
@@ -88,6 +94,9 @@ public:
 	void Set_S2F50_Module_Fail();		// Module_Fail Ack
 	void Set_S2F50_ModuleData();		// LOT_MODULE_DATA_DETAIL Ack
 	void Set_S2F50_NGLotStart();		// NGLotStart Ack
+
+	void Set_S2F50_PPSelect();
+	void Set_S2F50_PPUploadConfirm();
 
 	void Set_S6F11_ControlState(int nState);			// 1:Online, 2:Offline
 	void Set_S6F11_EquipState(int nState, int nErrNo);	// 2:Idle, 5:Run, 6:Down
@@ -104,6 +113,10 @@ public:
 	void Set_S6F11_NGLotRequest();	//NG Lot 발번요청
 	void Set_S6F11_NGLotStart(CString sNGLotId, int nMarCount);
 	void Set_S6F11_NGLotEnd(CString sNGLotId, int nMarCount);
+
+	void Set_S6F11_PPSelectReport(CString sLotId);
+	void Set_S6F11_PPUploadCompletedReport(CString sLotId);
+
 
 	void Test_Send();
 	void Test_WriteLog();
