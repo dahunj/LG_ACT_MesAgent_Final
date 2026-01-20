@@ -28,6 +28,7 @@ void CMesAgentDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LED_HANDLER_STATE, m_ledHandlerState);
 	DDX_Control(pDX, IDC_LED_HOST_STATE, m_ledHostState);
 	DDX_Control(pDX, IDC_LED_VISION_STATE, m_ledVisionState);
+	DDX_Control(pDX, IDC_PROGRESS_RMS, m_PgrCtrlRMS);
 }
 
 BEGIN_MESSAGE_MAP(CMesAgentDlg, CDialogEx)
@@ -48,6 +49,7 @@ BEGIN_MESSAGE_MAP(CMesAgentDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_VISION_OPEN, &CMesAgentDlg::OnBnClickedBtnVisionOpen)
 	ON_BN_CLICKED(IDC_BTN_VISION_CLOSE, &CMesAgentDlg::OnBnClickedBtnVisionClose)
 	ON_BN_CLICKED(IDC_BTN_VISION_REQUEST, &CMesAgentDlg::OnBnClickedBtnVisionConnect)
+	ON_BN_CLICKED(IDC_BTN_RMS_LOAD, &CMesAgentDlg::OnBnClickedBtnRmsLoad)
 END_MESSAGE_MAP()
 
 // CMesAgentDlg 메시지 처리기
@@ -76,6 +78,31 @@ BOOL CMesAgentDlg::OnInitDialog()
 	SetWindowText(sTemp);
 	g_objCommon.Clean_Data();
 
+	gData.nRMSPgr = 0;
+	gData.nTotalCnt = 0;
+
+
+	for(int i = 0; i < 5; i++)
+	{
+		sTemp.Format("%d", i+1);
+		CIniFileCS INI("D:\\Vision Data\\Recipe\\FaiMeasureSpec_DFA_PC"+sTemp+".ini");
+		if (!INI.Check_File()) 
+		{ 
+			AfxMessageBox("FaiMeasureSpec_DFA_PC"+sTemp+".ini File Not Found!!!");
+			return FALSE; 
+		}
+
+		gData.nFAICnt[i] = INI.Get_Integer("FAI_COUNT","FAI_INSPECT_COUNT_PC"+sTemp, 0);
+		gData.nTotalCnt += gData.nFAICnt[i]; 
+	}
+
+	m_PgrCtrlRMS.SetRange(0,gData.nTotalCnt);
+
+	g_objCommon.Read_Config();
+
+	g_objCommon.Load_RMSData();
+	g_objCommon.BuildDataIdValueVector(gData.sRMSPath + "\\EquipData.ini", gData.sRMSPath + "\\MoveData.ini", vecHandlerData);
+	
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -173,6 +200,10 @@ void CMesAgentDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 	gData.sOperId = "00000";
 	gData.nPreEquipState = gData.nCurEquipState = 0; 
 
+	g_objCommon.Load_RMSData();
+	g_objCommon.BuildDataIdValueVector(gData.sRMSPath +"\\EquipData.ini", gData.sRMSPath + "\\MoveData.ini", vecHandlerData);
+
+
 	SetTimer(0, 1000, NULL);
 }
 
@@ -183,10 +214,13 @@ void CMesAgentDlg::OnTimer(UINT_PTR nIDEvent)
 	Check_DeleteLog();	// 오래된 로그 삭제
 
 	DWORD dwTerm = GetTickCount() - g_objHost.Get_LastTime();
-	if (g_objHost.Is_Connected() && g_objHost.Is_HostOnline() && dwTerm > 20000) {
+	if (g_objHost.Is_Connected() && g_objHost.Is_HostOnline() && dwTerm > 60000) {
 		g_objHost.Set_S6F11_ControlState(2);	// 1:Online, 2:Offline
 		g_objHandler.Set_ControlState(2);		// 1:Online, 2:Offline
 	}
+
+	m_PgrCtrlRMS.SetPos(gData.nRMSPgr);
+	
 
 	SetTimer(0, 1000, NULL);
 	CDialogEx::OnTimer(nIDEvent);
@@ -403,7 +437,11 @@ void CMesAgentDlg::Set_HostMsg(CString sMsg)
 
 void CMesAgentDlg::OnBnClickedBtnTest()
 {
-	g_objHost.Test_Set();
+
+	g_objCommon.BuildDataIdValueVector(gData.sRMSPath +"\\EquipData.ini", gData.sRMSPath + "\\MoveData.ini", vecHandlerData);
+	//gData.bRMSLoad_ALL = FALSE;
+	//g_objCommon.Load_RMSData();
+	//g_objHost.Test_Set();
 }
 
 void CMesAgentDlg::Test_Data()
@@ -421,3 +459,10 @@ void CMesAgentDlg::Test_Data()
 	g_objHost.Test_Send();
 }
 
+
+void CMesAgentDlg::OnBnClickedBtnRmsLoad()
+{
+	g_objCommon.Load_RMSData();
+	g_objCommon.BuildDataIdValueVector(gData.sRMSPath +"\\EquipData.ini", gData.sRMSPath + "\\MoveData.ini", vecHandlerData);
+	
+}

@@ -9,3 +9,9 @@ GLOVAL_DATA	gData;
 GLOVAL_MES	gMes;
 GLOVAL_IDLE	gIdle;
 GLOVAL_MARGINAL	gMar;
+
+
+std::vector<CIniItem> glistFAIInfo[5];
+std::vector<CIniItem> glistLightInfo[5];
+std::vector<CIniItem> glistParamInfo[5];
+vectorPair vecHandlerData;

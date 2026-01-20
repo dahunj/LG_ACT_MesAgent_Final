@@ -191,6 +191,11 @@ LRESULT CHandler::OnServerReceive(WPARAM wClientIdx, LPARAM lServerPort)
 //			if (strOp == "INFO")	Get_CarrierInfo(strArg[0], strArg[1], strArg[2], strArg[3], strArg[4], strArg[5], strArg[6]);
 
 		} 
+		else if (strCmd == "RMS")
+		{
+			if (strOp == "CHECK")		Get_RMSCheck();
+			
+		} 
 	}
 
 	return 0;
@@ -332,6 +337,22 @@ void CHandler::Get_NGLotEnd(CString sNGLotId, CString sCount)
 {
 	int nCount = atoi(sCount);
 	g_objHost.Set_S6F11_NGLotEnd(sNGLotId, nCount);
+
+}
+
+void CHandler::Get_RMSCheck()
+{
+	gData.bRMSLoad_ALL = FALSE;
+	if(gData.bRMSLoad_ALL)
+	{
+		Set_RMSAlreadyDone();
+	}
+	else
+	{
+		g_objCommon.Load_RMSData();
+		g_objCommon.BuildDataIdValueVector(gData.sRMSPath +"\\EquipData.ini", gData.sRMSPath + "\\MoveData.ini", vecHandlerData);
+		//do nothing
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -470,6 +491,35 @@ void CHandler::Set_PPSelect()
 	strSend.Format("RECIPE,SELECT,%s,%s", gMes.sHostLotId, gMes.sHostRecipe);
 	Send_Command(strSend);
 }
+
+void CHandler::Set_PPUploadCompletedReport()
+{
+	CString strSend;
+	strSend.Format("RECIPE,COMPLETE,%s,%s", gMes.sHostLotId, gMes.sHostRecipe);
+	Send_Command(strSend);
+}
+
+void CHandler::Set_PPUploadFail()
+{
+	CString strSend;
+	strSend.Format("RECIPE,FAIL,%s,%s,%s,%s", gMes.sHostLotId, gMes.sHostRecipe, gMes.sCancelCode, gMes.sCancelText);
+	Send_Command(strSend);
+}
+
+void CHandler::Set_RMSLoadDone()
+{
+	CString strSend;
+	strSend.Format("RMS,LOADDONE");
+	Send_Command(strSend);
+}
+
+void CHandler::Set_RMSAlreadyDone()
+{
+	CString strSend;
+	strSend.Format("RMS,ALREADYDONE");
+	Send_Command(strSend);
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

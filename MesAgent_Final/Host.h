@@ -64,6 +64,7 @@ private:
 
 	void Get_S2F49_PPSelect();
 	void Get_S2F49_PPUploadConfirm();
+	void Get_S2F49_PPUploadFail();
 
 	void Reply_HeartBeat();	// Heart Beat
 	void Send_Command(CString sSend, BOOL bReply, CString sStFn, CString sRcmd="");	// XML
@@ -97,6 +98,7 @@ public:
 
 	void Set_S2F50_PPSelect();
 	void Set_S2F50_PPUploadConfirm();
+	void Set_S2F50_PPUploadFail();
 
 	void Set_S6F11_ControlState(int nState);			// 1:Online, 2:Offline
 	void Set_S6F11_EquipState(int nState, int nErrNo);	// 2:Idle, 5:Run, 6:Down

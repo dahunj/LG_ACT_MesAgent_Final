@@ -43,12 +43,14 @@ private:
 		
 	void Get_RecipeList(CString sRecipeData);
 	void Get_RecipeReport(CString sVersion);
+	
 
 	void Get_TerminalOK();
 
 	void Get_NGLotRequest();
 	void Get_NGLotStart(CString sNGLotId, CString sMarCount);
 	void Get_NGLotEnd(CString sNGLotId, CString sMarCount);
+	void Get_RMSCheck();
 
 public:
 	void Send_Command(CString sSend);
@@ -67,9 +69,14 @@ public:
 	void Set_NGLotStart();
 
 	void Set_PPSelect();
+	void Set_PPUploadFail();
+	void Set_PPUploadCompletedReport();
 
 	void Set_RecipeListRequest(BOOL bList);
 	void Set_HostMsg(CString sMsg);
+
+	void Set_RMSLoadDone();
+	void Set_RMSAlreadyDone();
 };
 
 extern CHandler g_objHandler;

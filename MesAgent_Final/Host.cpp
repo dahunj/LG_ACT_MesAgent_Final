@@ -165,14 +165,18 @@ LRESULT CHost::OnServerReceive(WPARAM wClientIdx, LPARAM lServerPort)
 			else if (m_strStFn == "S2F31") Get_S2F31(); // Date and Time Set Request
 			else if (m_strStFn == "S7F19") Get_S7F19();	// Recip List Request
 			else if (m_strStFn == "S10F3") Get_S10F3();	// Terminal Display, Single
+			else if (m_strStFn == "S7F25") Get_S7F25();	// Formatted Process Program Request
 			else if (m_strStFn == "S2F49") {			// Remote Command
 				if		(m_strRcmd == "LOT_START")		 Get_S2F49_LotStart();
 				else if (m_strRcmd == "LOT_ID_FAIL")	 Get_S2F49_LotCancel();
 				else if (m_strRcmd == "PRODUCT_DATA")	 Get_S2F49_ProductData();
 				else if (m_strRcmd == "PRODUCT_ID_FAIL") Get_S2F49_Module_Fail();
 				else if (m_strRcmd == "LOT_MODULE_DATA_DETAIL") Get_S2F49_Module_Data();
+				else if (m_strRcmd == "PP_SELECT")				Get_S2F49_PPSelect();
+				else if (m_strRcmd == "PP_UPLOAD_CONFIRM")		Get_S2F49_PPUploadConfirm();
+				else if (m_strRcmd == "PP_UPLOAD_FAIL")			Get_S2F49_PPUploadFail();
+				
 				else if (m_strRcmd == "NG_LOT_START")	 Get_S2F49_NGLotStart();
-
 			}
 		}
 	}
@@ -200,19 +204,26 @@ BOOL CHost::Extract_Xml(CString sXmlData)
 	CXmlNode node = m_xml.GetRoot();
 	m_strStFn = node.GetAttribute("ID");
 
-	if (m_strStFn == "S2F31") {
+	if (m_strStFn == "S2F31") 
+	{
 		CXmlNode nodeTime = m_xml.GetRoot()->GetChild("ITEM")->GetChild("TIME");
 		m_strSetTime = nodeTime.GetAttribute("VALUE", "");
 
-	} else if(m_strStFn == "S1F3") {
+	} 
+	else if(m_strStFn == "S1F3") 
+	{
 		CXmlNodes nodes = m_xml.GetRoot()->GetChild("ITEM")->GetChild("SVIDLIST")->GetChildren();//GetChild("CPLIST");
 		m_nS1F4AckNo = nodes.GetCount();
 
-	} else if(m_strStFn == "S10F3") {
+	}
+	else if(m_strStFn == "S10F3") 
+	{
 		CXmlNode nodeTime = m_xml.GetRoot()->GetChild("ITEM");
 		m_sHostMsg = nodeTime.GetChild("TEXT")->GetAttribute("VALUE");
 
-	} else if (m_strStFn == "S2F49") {
+	} 
+	else if (m_strStFn == "S2F49")
+	{
 		CXmlNode nodeE = m_xml.GetRoot()->GetChild("ITEM")->GetChild("RCMDCP")->GetChild("RCMD");
 		m_strRcmd = nodeE.GetAttribute("VALUE", "");
 
@@ -324,6 +335,39 @@ BOOL CHost::Extract_Xml(CString sXmlData)
 
 				}
 			}
+
+		} else if (m_strRcmd == "PP_SELECT") {
+ 			CXmlNodes nodesPD = m_xml.GetRoot()->GetChild("ITEM")->GetChild("RCMDCP")->GetChild("CPLIST")->GetChildren();
+ 			int nCount = nodesPD.GetCount();
+ 
+ 			for (int i = 0; i < nCount; i++) {
+ 				CString strName = nodesPD[i]->GetChild("CPNAME")->GetAttribute("VALUE");
+ 				CString strData = nodesPD[i]->GetChild("CPVAL")->GetAttribute("VALUE");
+ 
+ 				if (strName == "LOTID")		gMes.sHostLotId = strData;
+				if (strName == "PROCID")	gMes.sHostProcID = strData;
+				if (strName == "PRODUCTID")	gMes.sHostModel = strData;
+ 				if (strName == "RECIPEID")	gMes.sHostRecipe = strData;
+
+ 			}
+
+		} else if (m_strRcmd == "PP_UPLOAD_CONFIRM") {
+			nodeE = m_xml.GetRoot()->GetChild("ITEM")->GetChild("RCMDCP")->GetChild("RESULT");
+			gMes.sCancelCode = nodeE.GetChild("CODE")->GetAttribute("VALUE");
+			gMes.sCancelText = nodeE.GetChild("TEXT")->GetAttribute("VALUE");
+
+		} else if (m_strRcmd == "PP_UPLOAD_FAIL") {
+			CXmlNodes nodes = m_xml.GetRoot()->GetChild("ITEM")->GetChild("RCMDCP")->GetChild("CPLIST")->GetChildren();
+			int nCount = nodes.GetCount();
+
+			for (int i = 0; i < nCount; i++) {
+				CString strName = nodes[i]->GetChild("CPNAME")->GetAttribute("VALUE");
+				CString strData = nodes[i]->GetChild("CPVAL")->GetAttribute("VALUE");
+
+				if (strName	== "CODE")	gMes.sCancelCode = strData;
+				if (strName	== "TEXT")	gMes.sCancelText = strData;
+			}
+
 		}
 	}
 	m_xml.Close();
@@ -332,9 +376,6 @@ BOOL CHost::Extract_Xml(CString sXmlData)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get Command
-
-
-
 
 void CHost::Get_S1F2()
 {
@@ -448,7 +489,18 @@ void CHost::Get_S2F49_PPUploadConfirm()
 {
 	Set_S2F50_PPUploadConfirm();
 	Set_S6F11_PPUploadCompletedReport(gMes.sHostLotId);
+	g_objHandler.Set_PPUploadCompletedReport();
 }
+
+void CHost::Get_S2F49_PPUploadFail()
+{
+	Set_S2F50_PPUploadFail();
+	g_objHandler.Set_PPUploadFail();
+}
+
+
+
+
 
 /*
 void CHost::Get_S2F49_LotInfo()
@@ -1441,6 +1493,25 @@ void CHost::Set_S2F50_PPUploadConfirm()
 	Send_Command(strSend, TRUE, "S2F50", "PP_UPLOAD_CONFIRM");
 }
 
+void CHost::Set_S2F50_PPUploadFail()
+{
+	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
+
+	strSend += "<EIF VERSION=\"2.0\" ID=\"S2F50\" NAME=\"Enhanced Remote Command Acknowledge\">" + CRLF;
+	strSend += "  <ELEMENT>" + CRLF;
+	strSend += "    <EQPID VALUE=\"" + gData.sEquipId + "\" />" + CRLF;
+	strSend += "  </ELEMENT>" + CRLF;
+	strSend += "  <ITEM>" + CRLF;
+	strSend += "    <RCMDCP>" + CRLF;
+	strSend += "      <RCMD NAME=\"RCMD\" VALUE=\"PP_UPLOAD_FAIL\" />" + CRLF;
+	strSend += "    </RCMDCP>" + CRLF;
+	strSend += "    <HCACK NAME=\"HCACK\" VALUE=\"0\" />" + CRLF;
+	strSend += "  </ITEM>" + CRLF;
+	strSend += "</EIF>";
+
+	Send_Command(strSend, TRUE, "S2F50", "PP_UPLOAD_FAIL");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void CHost::Reply_HeartBeat()
@@ -1618,6 +1689,9 @@ int CHost::Test_Receive(CString strRecvSocket)
 				else if (m_strRcmd == "PRODUCT_DATA")	 Get_S2F49_ProductData();
 				else if (m_strRcmd == "PRODUCT_ID_FAIL") Get_S2F49_Module_Fail();
 				else if (m_strRcmd == "LOT_MODULE_DATA_DETAIL") Get_S2F49_Module_Data();
+			else if (m_strRcmd == "PP_SELECT")				Get_S2F49_PPSelect();
+			else if (m_strRcmd == "PP_UPLOAD_CONFIRM")		Get_S2F49_PPUploadConfirm();
+			else if (m_strRcmd == "PP_UPLOAD_FAIL")			Get_S2F49_PPUploadFail();
 			}
  	}
 	return 0;
