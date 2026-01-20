@@ -215,7 +215,7 @@ typedef std::vector< std::pair<CString, CString> > vectorPair; // (DataID, Value
 extern vectorPair vecHandlerData;
 
 
-static const int nHandlerDataIdCount = 153;
+static const int nHandlerDataIdCount = 149;
 static const CString const strHandlerDataIds[nHandlerDataIdCount] = {
 	"EQ_MODEL",
 	"EQ_VIS_PROG_VER",
@@ -230,16 +230,12 @@ static const CString const strHandlerDataIds[nHandlerDataIdCount] = {
 	"EQ_CM_CHECK",
 	"EQ_NG_SORT",
 	"EQ_ELEVATOR_ALIGN",
-	"EQ_INSPECT_BLOW",
-	"EQ_VACUUM_NOTCHECK",
+	"EQ_INSPECT_BLOW",	
 	"EQ_NG_MC",
 	"EQ_NG_GF",
 	"EQ_NG_BAC",
 	"EQ_NG_VIS",
 	"EQ_NG_MES",
-	"EQ_OFFSET_LOADZ",
-	"EQ_SPEED_LOADZ",
-	"EQ_ACCEL_LOADZ",
 	"EQ_COUNT_X",
 	"EQ_COUNT_Y",
 	"EQ_PITCH_X",

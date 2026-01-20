@@ -642,26 +642,26 @@ void CHost::Set_S7F26()
 	strSend += "    <PCLIST COUNT=\"" + strTotal +"\">" + CRLF;
 
 
-	//for (int i = 0; i < nHandlerDataIdCount; i++) 
-	//{
-	//	strSend += "    <LIST>" + CRLF;
-	//	strSend += "      <CCODE VALUE=\"" + vecHandlerData[i].first + "\" />" + CRLF;
-	//	strSend += "      <PPARM VALUE=\"" + vecHandlerData[i].second + "\" />" + CRLF;
-	//	strSend += "    </LIST>" + CRLF;
-	//}
-	//
-	//for(int j = 0; j < 5; j++)
-	//{
-	//	
-	//	for (int i = 0; i < gData.nFAICnt[j]; i++) 
-	//	//for (int i = 0; i < glistFAIInfo[j].size(); i++) 
-	//	{
-	//		strSend += "    <LIST>" + CRLF;
-	//		strSend += "      <CCODE VALUE=\"" + glistFAIInfo[j][i].key + "\" />" + CRLF;
-	//		strSend += "      <PPARM VALUE=\"" + glistFAIInfo[j][i].value + "\" />" + CRLF;
-	//		strSend += "    </LIST>" + CRLF;
-	//	}
-	//}
+	for (int i = 0; i < nHandlerDataIdCount; i++) 
+	{
+		strSend += "    <LIST>" + CRLF;
+		strSend += "      <CCODE VALUE=\"" + vecHandlerData[i].first + "\" />" + CRLF;
+		strSend += "      <PPARM VALUE=\"" + vecHandlerData[i].second + "\" />" + CRLF;
+		strSend += "    </LIST>" + CRLF;
+	}
+	
+	for(int j = 0; j < 5; j++)
+	{
+		
+		for (int i = 0; i < gData.nFAICnt[j]; i++) 
+		//for (int i = 0; i < glistFAIInfo[j].size(); i++) 
+		{
+			strSend += "    <LIST>" + CRLF;
+			strSend += "      <CCODE VALUE=\"" + glistFAIInfo[j][i].key + "\" />" + CRLF;
+			strSend += "      <PPARM VALUE=\"" + glistFAIInfo[j][i].value + "\" />" + CRLF;
+			strSend += "    </LIST>" + CRLF;
+		}
+	}
 	//payload capacity 한계로 인해 너무 커서 패킷이 유실 될 수 있다. 
 	/*for(int j = 0; j < 5; j++)
 	{
