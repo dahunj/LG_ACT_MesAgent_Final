@@ -251,7 +251,7 @@ void CCommon::Load_RMSData()
 	{
 		strTemp.Format("%d", i+1);
 
-		if(g_objCommon.LoadIniToVector("D:\\Vision Data\\Recipe\\FaiMeasureSpec_DFA_PC"+strTemp+".ini", glistFAIInfo[i], nFAIReadCnt[i]))
+		if(g_objCommon.LoadIniToVector("D:\\Vision Data\\Recipe\\FaiMeasureSpec_Final_PC"+strTemp+".ini", glistFAIInfo[i], nFAIReadCnt[i]))
 		{
 			if(nFAIReadCnt[i]-1 != gData.nFAICnt[i])
 			{

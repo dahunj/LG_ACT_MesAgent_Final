@@ -85,10 +85,10 @@ BOOL CMesAgentDlg::OnInitDialog()
 	for(int i = 0; i < 5; i++)
 	{
 		sTemp.Format("%d", i+1);
-		CIniFileCS INI("D:\\Vision Data\\Recipe\\FaiMeasureSpec_DFA_PC"+sTemp+".ini");
+		CIniFileCS INI("D:\\Vision Data\\Recipe\\FaiMeasureSpec_Final_PC"+sTemp+".ini");
 		if (!INI.Check_File()) 
 		{ 
-			AfxMessageBox("FaiMeasureSpec_DFA_PC"+sTemp+".ini File Not Found!!!");
+			AfxMessageBox("FaiMeasureSpec_Final_PC"+sTemp+".ini File Not Found!!!");
 			return FALSE; 
 		}
 
