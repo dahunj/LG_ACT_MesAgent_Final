@@ -66,7 +66,7 @@
 	#pragma comment(lib, "CSUdpClientR.lib")
 #endif
 
-#define MAIN_VERSION	"1.1.10f"		//Varo-Tray
+#define MAIN_VERSION	"V 1.1.11f"		//Varo-Tray
 
 extern CString gsCurrentDir;		// 현재 프로젝트 폴더
 

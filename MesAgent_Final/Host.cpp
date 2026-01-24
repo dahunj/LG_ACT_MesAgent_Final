@@ -626,7 +626,7 @@ void CHost::Set_S7F26()
 	CString strSend = "<?xml version=\"1.0\" encoding=\"utf-16\"?>" + CRLF;
 
 	CString strTotal;
-	//strTotal.Format("%d", gData.nTotalCnt+nHandlerDataIdCount);
+	strTotal.Format("%d", gData.nTotalCnt+nHandlerDataIdCount);
 
 	strSend += "<EIF VERSION=\"2.0\" ID=\"S7F26\" NAME=\"Formatted Process Program Data\">" + CRLF;
 	strSend += "  <ELEMENT>" + CRLF;

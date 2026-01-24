@@ -425,15 +425,15 @@ std::map<CString, CString>& CCommon::GetMoveKeyRuleMap()
 
 	// ===== GOOD_STAGE_Y1 / Y2 : LOAD, ALIGN =====
 	s_map[_T("GOOD_STAGE_Y1|LOAD")]  = _T("00");
-	s_map[_T("GOOD_STAGE_Y1|ALIGN")] = _T("06");
+	s_map[_T("GOOD_STAGE_Y1|ALIGN")] = _T("01");
 	s_map[_T("GOOD_STAGE_Y2|LOAD")]  = _T("00");
-	s_map[_T("GOOD_STAGE_Y2|ALIGN")] = _T("06");
+	s_map[_T("GOOD_STAGE_Y2|ALIGN")] = _T("01");
 
 	// ===== NG_STAGE_Y1 / Y2 : LOAD, ALIGN =====
 	s_map[_T("NG_STAGE_Y1|LOAD")]  = _T("00");
-	s_map[_T("NG_STAGE_Y1|ALIGN")] = _T("06");
+	s_map[_T("NG_STAGE_Y1|ALIGN")] = _T("01");
 	s_map[_T("NG_STAGE_Y2|LOAD")]  = _T("00");
-	s_map[_T("NG_STAGE_Y2|ALIGN")] = _T("06");
+	s_map[_T("NG_STAGE_Y2|ALIGN")] = _T("01");
 
 	// ===== LOAD_PICKER_* : LOAD_STAGE_1, LOAD_STAGE_2, BOTTOM, ALIGN =====
 	// X1
